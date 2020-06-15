@@ -1,0 +1,59 @@
+name: Mock3 CI
+
+on :
+  push:
+    branches:
+      - master
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize # new commit
+      - ready_for_review
+
+jobs:
+  tslint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Run TSLint
+        run: |
+          yarn
+          yarn lint
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Run Tests
+        run: |
+          yarn
+          yarn test
+  release:
+    if: github.event_name == 'push'
+    needs:
+      - tslint
+      - tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Build
+        run: |
+          yarn --prod
+          yarn build
+          ls -al dist
+          # TODO: create a new tag
+          # TODO: deploy to npm

@@ -1,0 +1,51 @@
+{
+  "name": "mock3",
+  "version": "0.1.0",
+  "description": "Mock3 is a tool to help DApp testing in UI test",
+  "main": "dist/index.js",
+  "repository": "git@github.com:curvegrid/mock3.git",
+  "author": {
+    "name": "Daenam Kim",
+    "email": "daenam@curvegrid.com"
+  },
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf ./dist",
+    "lint": "tslint --project \"./tsconfig.json\"",
+    "test": "./start-ganache.sh && yarn build && mocha --reporter spec && ./stop-ganache.sh"
+  },
+  "keywords": [
+    "mock",
+    "web3",
+    "ethereum",
+    "ui testing"
+  ],
+  "devDependencies": {
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
+    "ganache-cli": "^6.9.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.7",
+    "mocha": "^7.0.1",
+    "tslint": "^6.0.0"
+  },
+  "dependencies": {
+    "@types/node": "^13.5.1",
+    "ethers": "^4.0.43",
+    "typescript": "^3.7.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,}": [
+      "yarn lint"
+    ]
+  }
+}
