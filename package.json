@@ -27,7 +27,7 @@
     "@types/chai": "^4.2.7",
     "@types/mocha": "^5.2.7",
     "chai": "^4.2.0",
-    "ganache-cli": "^6.9.1",
+    "ganache-cli": "^6.12.2",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.7",
     "mocha": "^7.0.1",
