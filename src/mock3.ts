@@ -1,3 +1,4 @@
+import { Network } from '@ethersproject/networks';
 import { ethers } from 'ethers';
 import { DEFAULT_PROVIDER } from './constants';
 
@@ -20,7 +21,7 @@ class Mock3 {
     this.accountIndex = null;
   }
 
-  async getNetwork(): Promise<ethers.utils.Network> {
+  async getNetwork(): Promise<Network> {
     return await this.provider.getNetwork();
   }
 
