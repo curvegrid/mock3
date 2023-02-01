@@ -46,10 +46,10 @@ describe('Mock3 initialization', () => {
   });
 
   it('should return custom JSON RPC of passing a RPC URL', async () => {
-    const web3RPC = new Mock3('https://ropsten.infura.io/v3/e8b3e20085c348e3989f9cc83c4708ac');
+    const web3RPC = new Mock3(process.env.CUSTOM_RPC_ENDPOINT);
     const expectedResult = {
-      name: 'ropsten',
-      chainId: 3,
+      name: 'goerli',
+      chainId: 5,
       ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     }
     const actualResult = await web3RPC.getNetwork();
