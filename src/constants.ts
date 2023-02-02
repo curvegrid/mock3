@@ -1,1 +1,1 @@
-export const DEFAULT_PROVIDER = 'rinkeby';
+export const DEFAULT_PROVIDER = 'goerli';

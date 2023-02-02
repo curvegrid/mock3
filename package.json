@@ -1,6 +1,6 @@
 {
   "name": "mock3",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Mock3 is a tool to help DApp testing in UI test",
   "main": "dist/index.js",
   "repository": "git@github.com:curvegrid/mock3.git",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@types/node": "^13.5.1",
-    "ethers": "^4.0.43",
+    "ethers": "^5.7.2",
     "typescript": "^3.7.5"
   },
   "husky": {

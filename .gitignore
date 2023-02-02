@@ -4,3 +4,6 @@ dist
 
 # logs
 yarn-error.log
+
+.idea
+.env
