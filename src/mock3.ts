@@ -4,7 +4,7 @@ import { DEFAULT_PROVIDER } from './constants';
 
 interface SignerCache {
   [key: string]: ethers.Wallet;
-};
+}
 
 class Mock3 {
   private readonly provider: ethers.providers.BaseProvider;
@@ -21,7 +21,7 @@ class Mock3 {
     this.accountIndex = null;
   }
 
-  async getNetwork(): Promise<ethers.utils.Network> {
+  async getNetwork(): Promise<ethers.providers.Network> {
     return await this.provider.getNetwork();
   }
 

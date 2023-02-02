@@ -49,8 +49,9 @@ describe('Mock3 initialization', () => {
     // Use Polygon Mumbai testnet's public RPC URL
     const web3RPC = new Mock3("https://rpc-mumbai.maticvigil.com");
     const expectedResult = {
+      name: 'maticmum',
       chainId: 80001,
-      name: "unknown",
+      ensAddress: null,
     }
     const actualResult = await web3RPC.getNetwork();
     delete actualResult._defaultProvider;

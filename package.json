@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@types/node": "^13.5.1",
-    "ethers": "^4.0.43",
+    "ethers": "^5.7.2",
     "typescript": "^3.7.5"
   },
   "husky": {
