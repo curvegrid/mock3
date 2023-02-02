@@ -33,10 +33,10 @@ beforeEach(() => {
 });
 
 describe('Mock3 initialization', () => {
-  it('should return Rinkeby network as default', async () => {
+  it('should return Goerli network as default', async () => {
     const expectedResult = {
-      name: 'rinkeby',
-      chainId: 4,
+      name: 'goerli',
+      chainId: 5,
       ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     }
     const web3Default = new Mock3();
@@ -45,12 +45,12 @@ describe('Mock3 initialization', () => {
     expect(actualResult).eql(expectedResult);
   });
 
-  it('should return custom JSON RPC of passing a RPC URL', async () => {
-    const web3RPC = new Mock3(process.env.CUSTOM_RPC_ENDPOINT);
+  it('should return custom JSON RPC of passing a RPC URL (Polygon Mumbai)', async () => {
+    // Use Polygon Mumbai testnet's public RPC URL
+    const web3RPC = new Mock3("https://rpc-mumbai.maticvigil.com");
     const expectedResult = {
-      name: 'goerli',
-      chainId: 5,
-      ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+      chainId: 80001,
+      name: "unknown",
     }
     const actualResult = await web3RPC.getNetwork();
     delete actualResult._defaultProvider;
