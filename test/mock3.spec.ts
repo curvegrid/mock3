@@ -1,7 +1,7 @@
 'use strict';
 
-import { expect, assert } from 'chai';
-import { Wallet, TransactionReceipt } from 'ethers';
+import { assert, expect } from 'chai';
+import { TransactionReceipt, Wallet } from 'ethers';
 import { Mock3 } from '../dist/index.js';
 
 const signers = [
@@ -35,7 +35,7 @@ beforeEach(() => {
 describe('Mock3 initialization', () => {
   it('should return custom JSON RPC of passing a RPC URL (Polygon Mumbai)', async () => {
     // Use Polygon Mumbai testnet's public RPC URL
-    const web3RPC = new Mock3("https://rpc-mumbai.maticvigil.com");
+    const web3RPC = new Mock3('https://rpc-mumbai.maticvigil.com');
     const expectedResult = {
       name: 'matic-mumbai',
       chainId: BigInt(80001),
