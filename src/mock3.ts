@@ -23,6 +23,10 @@ class Mock3 {
     return await this.provider.getNetwork();
   }
 
+  async getBalance(address: ethers.AddressLike, blockTag?: ethers.BlockTag): Promise<bigint> {
+    return await this.provider.getBalance(address, blockTag);
+  }
+
   async getSigner(indexOrAddress?: number | string): Promise<ethers.Wallet | undefined> {
     switch (typeof indexOrAddress) {
       case 'string':
@@ -43,13 +47,6 @@ class Mock3 {
     }
 
     return Promise.resolve(accounts);
-  }
-
-  async send(method: string, params: any[] | Record<string, any>): Promise<any> {
-    if (method === 'eth_accounts') {
-      return this.listAccounts();
-    }
-    return null
   }
 
   async getTransactionReceipt(transactionHash: string)
