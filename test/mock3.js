@@ -37,13 +37,11 @@ describe('Mock3 initialization', () => {
     // Use Polygon Mumbai testnet's public RPC URL
     const web3RPC = new Mock3("https://rpc-mumbai.maticvigil.com");
     const expectedResult = {
-      name: 'maticmum',
-      chainId: 80001,
-      ensAddress: null,
+      name: 'matic-mumbai',
+      chainId: BigInt(80001),
     }
     const actualResult = await web3RPC.getNetwork();
-    delete actualResult._defaultProvider;
-    expect(actualResult).eql(expectedResult);
+    expect(actualResult.toJSON()).eql(expectedResult);
   });
 });
 
@@ -84,19 +82,19 @@ describe('Mock3 signer', () => {
     web3.setSigner(getPrivateKeys());
 
     const indexValid = 0;
-    const result1 = web3.getSigner(indexValid);
+    const result1 = await web3.getSigner(indexValid);
     expect(result1.address).eql(signers[0].ADDRESS);
 
     const keyValid = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-    const result2 = web3.getSigner(keyValid);
+    const result2 = await web3.getSigner(keyValid);
     expect(result2.address).eql(keyValid);
 
     const indexInvalid = 999;
-    const result3 = web3.getSigner(indexInvalid);
+    const result3 = await web3.getSigner(indexInvalid);
     assert.isUndefined(result3);
 
     const keyInvalid = '0xFFcf8FDEE72ac11b5c542428B35EEF576INVALID';
-    const result4 = web3.getSigner(keyInvalid);
+    const result4 = await web3.getSigner(keyInvalid);
     assert.isUndefined(result4);
   });
 
@@ -147,20 +145,15 @@ describe('Mock3 signer', () => {
   it('should return tx receipt', async () => {
     web3.setSigner(getPrivateKeys());
 
-    const signer = web3.getSigner(0);
-    const balanceBefore = await signer.getBalance();
+    const signer = await web3.getSigner(0);
+    const balanceBefore = await web3.getBalance(signer.address);
     const tx = await signer.sendTransaction({
       to: signer.address,
       value: 1,
     });
-
-    await new Promise((resolve) => {
-      web3.provider.once(tx.hash, async (receipt) => {
-        const balanceAfter = await signer.getBalance();
-        expect(receipt.transactionHash).eql(tx.hash);
-        assert.isTrue(balanceBefore.gte(balanceAfter));
-        resolve();
-      });
-    });
+    const txReceipt = await web3.getTransactionReceipt(tx.hash);
+    const balanceAfter = await web3.getBalance(signer.address);
+    expect(txReceipt.hash).eql(tx.hash);
+    assert.isTrue(balanceBefore >= balanceAfter);
   });
 });
