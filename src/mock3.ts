@@ -1,27 +1,26 @@
 import { ethers } from 'ethers';
 import { isNullOrUndefined } from 'util';
-import { DEFAULT_PROVIDER } from './constants';
 
 interface SignerCache {
   [key: string]: ethers.Wallet;
 }
 
 class Mock3 {
-  private readonly provider: ethers.providers.BaseProvider;
+  private readonly provider: ethers.JsonRpcProvider;
   private signers: SignerCache;
   private accountIndex: number | null;
 
   constructor(rpc?: string) {
-    this.provider = ethers.getDefaultProvider(DEFAULT_PROVIDER);
-    if (rpc) {
-      this.provider = new ethers.providers.JsonRpcProvider(rpc);
+    if (!rpc) {
+      throw new Error('empty or invalid rpc');
     }
 
+    this.provider = new ethers.JsonRpcProvider(rpc);
     this.signers = {};
     this.accountIndex = null;
   }
 
-  async getNetwork(): Promise<ethers.providers.Network> {
+  async getNetwork(): Promise<ethers.Network> {
     return await this.provider.getNetwork();
   }
 
@@ -47,9 +46,16 @@ class Mock3 {
     return Promise.resolve(accounts);
   }
 
+  async send(method: string, params: any[] | Record<string, any>): Promise<any> {
+    if (method === 'eth_accounts') {
+      return this.listAccounts();
+    }
+    return this.provider.send(method, params);
+  }
+
   async getTransactionReceipt(transactionHash: string)
-    :Promise<ethers.providers.TransactionReceipt> {
-    return await this.provider.getTransactionReceipt(transactionHash);
+    :Promise<ethers.TransactionReceipt | null> {
+    return this.provider.getTransactionReceipt(transactionHash);
   }
 
   setSigner(signerPrivateKey: string | string[]): ethers.Wallet | ethers.Wallet[] {
