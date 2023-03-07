@@ -2,7 +2,7 @@
 
 import { assert, expect } from 'chai';
 import { TransactionReceipt, Wallet } from 'ethers';
-import { Mock3 } from '../dist/index.js';
+import { Mock3 } from '../src';
 
 const signers = [
   {
