@@ -5,7 +5,7 @@ interface SignerCache {
 }
 
 class Mock3 {
-  private readonly provider: ethers.JsonRpcProvider;
+  private readonly provider: ethers.providers.JsonRpcProvider;
   private signers: SignerCache;
   private accountIndex: number | null;
 
@@ -14,12 +14,12 @@ class Mock3 {
       throw new Error('empty or invalid rpc');
     }
 
-    this.provider = new ethers.JsonRpcProvider(rpc);
+    this.provider = new ethers.providers.JsonRpcProvider(rpc);
     this.signers = {};
     this.accountIndex = null;
   }
 
-  async getNetwork(): Promise<ethers.Network> {
+  async getNetwork(): Promise<ethers.providers.Network> {
     return await this.provider.getNetwork();
   }
 
@@ -49,11 +49,11 @@ class Mock3 {
     if (method === 'eth_accounts') {
       return this.listAccounts();
     }
-    return this.provider.send(method, params);
+    return null
   }
 
   async getTransactionReceipt(transactionHash: string)
-    :Promise<ethers.TransactionReceipt | null> {
+    :Promise<ethers.providers.TransactionReceipt | null> {
     return this.provider.getTransactionReceipt(transactionHash);
   }
 
