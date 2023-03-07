@@ -1,5 +1,4 @@
 import { ethers } from 'ethers';
-import { isNullOrUndefined } from 'util';
 
 interface SignerCache {
   [key: string]: ethers.Wallet;
@@ -38,7 +37,7 @@ class Mock3 {
   async listAccounts(): Promise<string[]> {
     const accounts: string[] = Object.values(this.signers).map(signer => signer.address)
 
-    if (!isNullOrUndefined(this.accountIndex)) {
+    if (this.accountIndex !== null && this.accountIndex !== undefined) {
       const found = accounts[this.accountIndex];
       return found ? Promise.resolve([found]) : Promise.resolve([]);
     }
