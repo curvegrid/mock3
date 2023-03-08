@@ -11,7 +11,7 @@ class Mock3 {
 
   constructor(rpc?: string) {
     if (!rpc) {
-      throw new Error('empty or invalid rpc');
+      throw new Error('empty rpc');
     }
 
     this.provider = new ethers.JsonRpcProvider(rpc);

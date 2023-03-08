@@ -33,6 +33,14 @@ beforeEach(() => {
 });
 
 describe('Mock3 initialization', () => {
+  it('should error if RPC URL is empty', () => {
+    try {
+      new Mock3('')
+    } catch (e: unknown) {
+      expect(e instanceof Error).to.be.true;
+      expect((e as Error).message).to.eql('empty rpc');
+    }
+  });
   it('should return custom JSON RPC of passing a RPC URL (Polygon Mumbai)', async () => {
     // Use Polygon Mumbai testnet's public RPC URL
     const web3RPC = new Mock3('https://rpc-mumbai.maticvigil.com');
