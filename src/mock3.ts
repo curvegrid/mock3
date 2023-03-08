@@ -14,9 +14,7 @@ class Mock3 {
       throw new Error('empty rpc');
     }
 
-    console.log('MOCK3: 1: ', rpc);
     this.provider = new ethers.JsonRpcProvider(rpc);
-    console.log('MOCK3: 2');
     this.signers = {};
     this.accountIndex = null;
   }
