@@ -35,9 +35,9 @@ beforeEach(() => {
 describe('Mock3 initialization', () => {
   it('should error if RPC URL is empty', () => {
     try {
-      new Mock3('')
+      web3 = new Mock3();
     } catch (e: unknown) {
-      expect(e instanceof Error).to.be.true;
+      expect(e).instanceOf(Error);
       expect((e as Error).message).to.eql('empty rpc');
     }
   });
