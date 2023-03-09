@@ -1,7 +1,7 @@
 'use strict';
 
 import { assert, expect } from 'chai';
-import { TransactionReceipt, Wallet } from 'ethers';
+import { JsonRpcProvider, JsonRpcSigner, TransactionReceipt, Wallet } from 'ethers';
 import { Mock3 } from '../src';
 
 const signers = [
@@ -21,6 +21,10 @@ const signers = [
 
 const getAccounts = () => {
   return signers.map(signer => signer.ADDRESS);
+}
+
+const getJsonRpcSigners = (provider: JsonRpcProvider) => {
+  return getAccounts().map(signer => new JsonRpcSigner(provider, signer));
 }
 
 const getPrivateKeys = () => {
@@ -114,7 +118,7 @@ describe('Mock3 signer', () => {
 
     const result2 = await web3.listAccounts();
     expect(result2.length).eql(signers.length);
-    expect(result2).eql(getAccounts());
+    expect(result2).eql(getJsonRpcSigners(web3.provider));
   });
 
   it('should return an only specific account of the index after account index is set', async () => {
@@ -123,19 +127,19 @@ describe('Mock3 signer', () => {
     // unset account index
     const result1 = await web3.listAccounts();
     expect(result1.length).eql(signers.length);
-    expect(result1).eql(getAccounts());
+    expect(result1).eql(getJsonRpcSigners(web3.provider));
 
     // set account index to null
     web3.setAccountIndex(null);
     const result2 = await web3.listAccounts();
     expect(result2.length).eql(signers.length);
-    expect(result2).eql(getAccounts());
+    expect(result2).eql(getJsonRpcSigners(web3.provider));
 
     const indexValid = 2;
     web3.setAccountIndex(indexValid);
     const result3 = await web3.listAccounts();
     expect(result3.length).eql(1);
-    expect(result3).eql([signers[indexValid].ADDRESS]);
+    expect(result3).eql([new JsonRpcSigner(web3.provider, signers[indexValid].ADDRESS)]);
 
     // set account index to the out of range
     web3.setAccountIndex(-1);
@@ -154,14 +158,17 @@ describe('Mock3 signer', () => {
     web3.setSigner(getPrivateKeys());
 
     const signer = await web3.getSigner(0) as Wallet;
-    const balanceBefore = await web3.getBalance(signer.address);
+    const balanceBefore = await web3.getBalance(signers[2].ADDRESS);
     const tx = await signer.sendTransaction({
-      to: signer.address,
-      value: 1,
+      from: signer.address,
+      to: signers[2].ADDRESS,
+      value: 1000,
     });
     const txReceipt = await web3.getTransactionReceipt(tx.hash) as TransactionReceipt;
-    const balanceAfter = await web3.getBalance(signer.address);
+    const balanceAfter = await web3.getBalance(signers[2].ADDRESS);
     expect(txReceipt.hash).eql(tx.hash);
-    assert.isTrue(balanceBefore >= balanceAfter);
+    console.log(balanceBefore, balanceAfter);
+    // TODO: make sure tx is complete
+    assert.isTrue(balanceBefore < balanceAfter);
   });
 });
