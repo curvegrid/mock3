@@ -5,9 +5,10 @@ interface SignerCache {
 }
 
 class Mock3 {
-  private readonly provider: ethers.JsonRpcProvider;
-  private signers: SignerCache;
-  private accountIndex: number | null;
+  provider: ethers.JsonRpcProvider;
+
+  #signers: SignerCache;
+  #accountIndex: number | null;
 
   constructor(rpc?: string) {
     if (!rpc) {
@@ -15,8 +16,8 @@ class Mock3 {
     }
 
     this.provider = new ethers.JsonRpcProvider(rpc);
-    this.signers = {};
-    this.accountIndex = null;
+    this.#signers = {};
+    this.#accountIndex = null;
   }
 
   async getNetwork(): Promise<ethers.Network> {
@@ -35,23 +36,23 @@ class Mock3 {
   async getSigner(indexOrAddress?: number | string): Promise<ethers.Wallet | undefined> {
     switch (typeof indexOrAddress) {
       case 'string':
-        return this.signers[indexOrAddress];
+        return this.#signers[indexOrAddress];
       case 'number':
-        return Object.values(this.signers)[indexOrAddress];
+        return Object.values(this.#signers)[indexOrAddress];
       default:
         return undefined;
     }
   }
 
-  async listAccounts(): Promise<string[]> {
-    const accounts: string[] = Object.values(this.signers).map(signer => signer.address)
+  async listAccounts(): Promise<ethers.JsonRpcSigner[]> {
+    const accounts: string[] = Object.values(this.#signers).map(signer => signer.address)
 
-    if (this.accountIndex !== null && this.accountIndex !== undefined) {
-      const found = accounts[this.accountIndex];
-      return found ? Promise.resolve([found]) : Promise.resolve([]);
+    if (this.#accountIndex !== null && this.#accountIndex !== undefined) {
+      const found = accounts[this.#accountIndex];
+      return found ? [new ethers.JsonRpcSigner(this.provider,found)] : [];
     }
 
-    return Promise.resolve(accounts);
+    return accounts.map(account => new ethers.JsonRpcSigner(this.provider, account));
   }
 
   setSigner(signerPrivateKey: string | string[]): ethers.Wallet | ethers.Wallet[] {
@@ -59,19 +60,19 @@ class Mock3 {
       const created: ethers.Wallet[] = [];
       signerPrivateKey.forEach(privateKey => {
         const wallet: ethers.Wallet = new ethers.Wallet(privateKey, this.provider);
-        this.signers[wallet.address] = wallet;
+        this.#signers[wallet.address] = wallet;
         created.push(wallet);
       });
       return created;
     } else  {
       const created: ethers.Wallet = new ethers.Wallet(signerPrivateKey, this.provider);
-      this.signers[created.address] = created;
+      this.#signers[created.address] = created;
       return created;
     }
   }
 
   setAccountIndex(index: number | null): void {
-    this.accountIndex = index;
+    this.#accountIndex = index;
   }
 }
 
