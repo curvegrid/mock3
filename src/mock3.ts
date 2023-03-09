@@ -20,11 +20,16 @@ class Mock3 {
   }
 
   async getNetwork(): Promise<ethers.Network> {
-    return await this.provider.getNetwork();
+    return this.provider.getNetwork();
   }
 
   async getBalance(address: ethers.AddressLike, blockTag?: ethers.BlockTag): Promise<bigint> {
-    return await this.provider.getBalance(address, blockTag);
+    return this.provider.getBalance(address, blockTag);
+  }
+
+  async getTransactionReceipt(transactionHash: string)
+    :Promise<ethers.TransactionReceipt | null> {
+    return this.provider.getTransactionReceipt(transactionHash);
   }
 
   async getSigner(indexOrAddress?: number | string): Promise<ethers.Wallet | undefined> {
@@ -47,11 +52,6 @@ class Mock3 {
     }
 
     return Promise.resolve(accounts);
-  }
-
-  async getTransactionReceipt(transactionHash: string)
-    :Promise<ethers.TransactionReceipt | null> {
-    return this.provider.getTransactionReceipt(transactionHash);
   }
 
   setSigner(signerPrivateKey: string | string[]): ethers.Wallet | ethers.Wallet[] {
