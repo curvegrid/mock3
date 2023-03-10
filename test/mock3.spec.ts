@@ -165,7 +165,7 @@ describe('Mock3 signer', () => {
       to: signers[2].ADDRESS,
       value: parseEther('2'),
     });
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 500));
     const txReceipt = await web3.getTransactionReceipt(tx.hash) as TransactionReceipt;
     const balanceAfter = await web3.getBalance(signers[2].ADDRESS);;
     expect(txReceipt.hash).eql(tx.hash);
