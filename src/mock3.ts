@@ -28,10 +28,25 @@ class Mock3 {
     return this.provider.getBalance(address, blockTag);
   }
 
+  async getTransactionCount(address: ethers.AddressLike, blockTag?: ethers.BlockTag)
+    :Promise<number> {
+    return this.provider.getTransactionCount(address, blockTag);
+  }
+
+  async getFeeData(): Promise<ethers.FeeData> {
+    return this.provider.getFeeData();
+  }
+
+  async broadcastTransaction(signedTx: string): Promise<ethers.TransactionResponse> {
+    return this.provider.broadcastTransaction(signedTx);
+  }
+
   async getTransactionReceipt(transactionHash: string)
     :Promise<ethers.TransactionReceipt | null> {
     return this.provider.getTransactionReceipt(transactionHash);
   }
+
+  // Custom functions to work for signing transaction without user side action
 
   async getSigner(indexOrAddress?: number | string): Promise<ethers.Wallet | undefined> {
     switch (typeof indexOrAddress) {
