@@ -1,7 +1,7 @@
 'use strict';
 
 import { assert, expect } from 'chai';
-import { parseEther, JsonRpcProvider, JsonRpcSigner, TransactionReceipt, Wallet } from 'ethers';
+import { JsonRpcProvider, JsonRpcSigner, parseEther, TransactionReceipt, Wallet } from 'ethers';
 import { setTimeout } from 'timers';
 import { Mock3 } from '../src';
 
@@ -167,7 +167,7 @@ describe('Mock3 signer', () => {
     });
     await new Promise(r => setTimeout(r, 100));
     const txReceipt = await web3.getTransactionReceipt(tx.hash) as TransactionReceipt;
-    let balanceAfter = await web3.getBalance(signers[2].ADDRESS);;
+    const balanceAfter = await web3.getBalance(signers[2].ADDRESS);;
     expect(txReceipt.hash).eql(tx.hash);
     assert.isTrue(balanceBefore < balanceAfter);
   });
