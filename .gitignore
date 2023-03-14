@@ -1,9 +1,10 @@
 # dirs
-node_modules
-dist
+node_modules/**
+dist/test
 
 # logs
 yarn-error.log
 
 .idea
 .env
+.DS_Store
