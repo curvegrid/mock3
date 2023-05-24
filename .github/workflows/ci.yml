@@ -39,6 +39,7 @@ jobs:
           yarn
           yarn test
   release:
+    if: github.event_name == 'push'
     needs:
       - tslint
       - tests
