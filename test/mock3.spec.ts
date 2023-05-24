@@ -51,7 +51,7 @@ describe('Mock3 initialization', () => {
     const web3RPC = new Mock3('https://rpc-mumbai.maticvigil.com');
     const expectedResult = {
       name: 'matic-mumbai',
-      chainId: BigInt(80001),
+      chainId: BigInt(80001).toString(),
     }
     const actualResult = await web3RPC.getNetwork();
     expect(actualResult.toJSON()).eql(expectedResult);
