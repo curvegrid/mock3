@@ -51,7 +51,7 @@ jobs:
           node-version: 18
       - name: Build
         run: |
-          yarn --prod
+          yarn
           yarn build
           ls -al dist
           # TODO: create a new tag
