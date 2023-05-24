@@ -1,8 +1,9 @@
 'use strict';
 
-const { expect, assert } = require('chai');
-const { Wallet } = require('ethers');
-const { Mock3 } = require('../dist/index.js');
+import { assert, expect } from 'chai';
+import { JsonRpcProvider, JsonRpcSigner, parseEther, TransactionReceipt, Wallet } from 'ethers';
+import { setTimeout } from 'timers';
+import { Mock3 } from '../src';
 
 const signers = [
   {
@@ -23,59 +24,57 @@ const getAccounts = () => {
   return signers.map(signer => signer.ADDRESS);
 }
 
+const getJsonRpcSigners = (provider: JsonRpcProvider) => {
+  return getAccounts().map(signer => new JsonRpcSigner(provider, signer));
+}
+
 const getPrivateKeys = () => {
   return signers.map(signer => signer.PRIVATE_KEY);
 }
 
-let web3;
+let web3: Mock3;
 beforeEach(() => {
   web3 = new Mock3('http://127.0.0.1:9545');
 });
 
 describe('Mock3 initialization', () => {
-  it('should return Goerli network as default', async () => {
-    const expectedResult = {
-      name: 'goerli',
-      chainId: 5,
-      ensAddress: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+  it('should error if RPC URL is empty', () => {
+    try {
+      web3 = new Mock3();
+    } catch (e: unknown) {
+      expect(e).instanceOf(Error);
+      expect((e as Error).message).to.eql('empty rpc');
     }
-    const web3Default = new Mock3();
-    const actualResult = await web3Default.getNetwork();
-    delete actualResult._defaultProvider;
-    expect(actualResult).eql(expectedResult);
   });
-
   it('should return custom JSON RPC of passing a RPC URL (Polygon Mumbai)', async () => {
     // Use Polygon Mumbai testnet's public RPC URL
-    const web3RPC = new Mock3("https://rpc-mumbai.maticvigil.com");
+    const web3RPC = new Mock3('https://rpc-mumbai.maticvigil.com');
     const expectedResult = {
-      name: 'maticmum',
-      chainId: 80001,
-      ensAddress: null,
+      name: 'matic-mumbai',
+      chainId: BigInt(80001).toString(),
     }
     const actualResult = await web3RPC.getNetwork();
-    delete actualResult._defaultProvider;
-    expect(actualResult).eql(expectedResult);
+    expect(actualResult.toJSON()).eql(expectedResult);
   });
 });
 
 describe('Mock3 signer', () => {
   it('can set an account with a private key', () => {
     const { signingKey: expectedResult } = new Wallet(signers[0].PRIVATE_KEY)
-    const { signingKey: actualResult } = web3.setSigner(signers[0].PRIVATE_KEY);
+    const { signingKey: actualResult } = web3.setSigner(signers[0].PRIVATE_KEY) as Wallet;
     expect(actualResult).eql(expectedResult);
   });
 
   it('can set accounts with multiple private keys', () => {
-    const expectedResult = [];
-    const actualResult = [];
+    const expectedResult: any[] = [];
+    const actualResult: any[] = [];
     signers.forEach((signer) => {
       const { signingKey: expected } = new Wallet(signer.PRIVATE_KEY)
       expectedResult.push(expected);
     });
 
-    const actualSigners = web3.setSigner(getPrivateKeys());
-    actualSigners.forEach((actualSigner) => {
+    const actualSigners = web3.setSigner(getPrivateKeys()) as Wallet[];
+    actualSigners.forEach((actualSigner: Wallet) => {
       actualResult.push(actualSigner.signingKey);
     });
     expect(actualResult).eql(expectedResult);
@@ -96,19 +95,19 @@ describe('Mock3 signer', () => {
     web3.setSigner(getPrivateKeys());
 
     const indexValid = 0;
-    const result1 = web3.getSigner(indexValid);
+    const result1 = await web3.getSigner(indexValid) as Wallet;
     expect(result1.address).eql(signers[0].ADDRESS);
 
     const keyValid = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-    const result2 = web3.getSigner(keyValid);
+    const result2 = await web3.getSigner(keyValid) as Wallet;
     expect(result2.address).eql(keyValid);
 
     const indexInvalid = 999;
-    const result3 = web3.getSigner(indexInvalid);
+    const result3 = await web3.getSigner(indexInvalid);
     assert.isUndefined(result3);
 
     const keyInvalid = '0xFFcf8FDEE72ac11b5c542428B35EEF576INVALID';
-    const result4 = web3.getSigner(keyInvalid);
+    const result4 = await web3.getSigner(keyInvalid);
     assert.isUndefined(result4);
   });
 
@@ -120,7 +119,7 @@ describe('Mock3 signer', () => {
 
     const result2 = await web3.listAccounts();
     expect(result2.length).eql(signers.length);
-    expect(result2).eql(getAccounts());
+    expect(result2).eql(getJsonRpcSigners(web3.provider));
   });
 
   it('should return an only specific account of the index after account index is set', async () => {
@@ -129,19 +128,19 @@ describe('Mock3 signer', () => {
     // unset account index
     const result1 = await web3.listAccounts();
     expect(result1.length).eql(signers.length);
-    expect(result1).eql(getAccounts());
+    expect(result1).eql(getJsonRpcSigners(web3.provider));
 
     // set account index to null
     web3.setAccountIndex(null);
     const result2 = await web3.listAccounts();
     expect(result2.length).eql(signers.length);
-    expect(result2).eql(getAccounts());
+    expect(result2).eql(getJsonRpcSigners(web3.provider));
 
     const indexValid = 2;
     web3.setAccountIndex(indexValid);
     const result3 = await web3.listAccounts();
     expect(result3.length).eql(1);
-    expect(result3).eql([signers[indexValid].ADDRESS]);
+    expect(result3).eql([new JsonRpcSigner(web3.provider, signers[indexValid].ADDRESS)]);
 
     // set account index to the out of range
     web3.setAccountIndex(-1);
@@ -159,20 +158,17 @@ describe('Mock3 signer', () => {
   it('should return tx receipt', async () => {
     web3.setSigner(getPrivateKeys());
 
-    const signer = web3.getSigner(0);
-    const balanceBefore = await signer.getBalance();
+    const signer = await web3.getSigner(0) as Wallet;
+    const balanceBefore = await web3.getBalance(signers[2].ADDRESS);
     const tx = await signer.sendTransaction({
-      to: signer.address,
-      value: 1,
+      from: signer.address,
+      to: signers[2].ADDRESS,
+      value: parseEther('2'),
     });
-
-    await new Promise((resolve) => {
-      web3.provider.once(tx.hash, async (receipt) => {
-        const balanceAfter = await signer.getBalance();
-        expect(receipt.transactionHash).eql(tx.hash);
-        assert.isTrue(balanceBefore.gte(balanceAfter));
-        resolve();
-      });
-    });
+    await new Promise(r => setTimeout(r, 500));
+    const txReceipt = await web3.getTransactionReceipt(tx.hash) as TransactionReceipt;
+    const balanceAfter = await web3.getBalance(signers[2].ADDRESS);;
+    expect(txReceipt.hash).eql(tx.hash);
+    assert.isTrue(balanceBefore < balanceAfter);
   });
 });
